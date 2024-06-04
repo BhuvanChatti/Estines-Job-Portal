@@ -1,0 +1,35 @@
+/* TopMenuBar.css */
+.top-menu-bar {
+    background-color: rgba(92, 108, 170, 0.486);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 20px;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    transition: background-color 0.3s;
+}
+
+.top-menu-bar:hover {
+    background-color: rgba(92, 108, 170, 0.736);
+}
+
+.menu-items {
+    display: flex;
+    gap: 250px;
+}
+
+.menu-item {
+    color: white;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 20px;
+}
+
+.menu-item:hover {
+    background-color: rgba(176, 50, 50, 0.5);
+    color: white;
+}
