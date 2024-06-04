@@ -29,7 +29,7 @@ const options = {
         },
         servers: [
             {
-                url: "https://estines-job-portal.onrender.com"
+                url: "http://localhost:8000"
             }
         ]
     },
