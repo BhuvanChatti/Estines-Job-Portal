@@ -59,15 +59,15 @@ export const registerC = async (req, res, next) => {
 export const loginC = async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
-        next('Provide required fields');
+        next(new Error('Provide required fields'));
     }
     const user = await userModels.findOne({ email }).select("+password");
     if (!user) {
-        next('Invalid email or password')
+        next(new Error('Invalid email or password'))
     }
     const isMatch = await user.compareP(password);
     if (!isMatch) {
-        next("Invalid user name or Password");
+        next(new Error("Invalid user name or Password"));
     }
     user.password = undefined;
     const token = user.createjwt()
