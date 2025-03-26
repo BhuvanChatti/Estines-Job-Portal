@@ -67,10 +67,13 @@ export const loginC = async (req, res) => {
     }
     const isMatch = await user.compareP(password);
     if (!isMatch) {
-        next("Invalid user name or Password"); zz
+        next("Invalid user name or Password");
     }
     user.password = undefined;
     const token = user.createjwt()
+    const date = new Date();
+    const currtime = new toLocaleString();
+    sendEmail(user.email, 'New login', 'Youve logged into our site at ${currtime}');
     res.status(200).json({
         success: true,
         messege: "Logged In successfully",
