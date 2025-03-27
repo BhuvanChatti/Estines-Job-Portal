@@ -57,27 +57,35 @@ export const registerC = async (req, res, next) => {
     });
 };
 export const loginC = async (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        next(new Error('Provide required fields'));
+    try{
+        const { email, password } = req.body;
+        if (!email || !password) {
+            next(new Error('Provide required fields'));
+        }
+        const user = await userModels.findOne({ email }).select("+password");
+        if (!user) {
+            next(new Error('Invalid email or password'))
+        }
+        console.log("User found:", user);
+        const isMatch = await user.compareP(password);
+        console.log("Password match:", isMatch);
+        if (!isMatch) {
+            next(new Error("Invalid user name or Password"));
+        }
+        user.password = undefined;
+        const token = user.createjwt()
+        const date = new Date();
+        const currtime = date.toLocaleString();
+        sendEmail(user.email, 'New login', 'Youve logged into our site at ${currtime}');
+        res.status(200).json({
+            success: true,
+            messege: "Logged In successfully",
+            user,
+            token,
+        })
     }
-    const user = await userModels.findOne({ email }).select("+password");
-    if (!user) {
-        next(new Error('Invalid email or password'))
+    catch (error) {
+        console.error("Login error:", error);
+        next(error);
     }
-    const isMatch = await user.compareP(password);
-    if (!isMatch) {
-        next(new Error("Invalid user name or Password"));
-    }
-    user.password = undefined;
-    const token = user.createjwt()
-    const date = new Date();
-    const currtime = new toLocaleString();
-    sendEmail(user.email, 'New login', 'Youve logged into our site at ${currtime}');
-    res.status(200).json({
-        success: true,
-        messege: "Logged In successfully",
-        user,
-        token,
-    })
 };
