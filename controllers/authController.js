@@ -70,7 +70,7 @@ export const loginC = async (req, res, next) => {
         const isMatch = await user.compareP(password);
         console.log("Password match:", isMatch);
         if (!isMatch) {
-            next("Invalid user name or Password");
+            next("Wrong Password. Enter again");
         }
         user.password = undefined;
         const token = user.createjwt()
