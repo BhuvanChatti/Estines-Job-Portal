@@ -33,7 +33,10 @@ userSchema.pre('save', async function () {
     this.password = await bcrypt.hash(this.password, salt);
 });
 userSchema.methods.compareP = async function (up) {
+    console.log("Provided Password:", up);
+    console.log("Stored Hash:", this.password);
     const isMatch = await bcrypt.compare(up, this.password);
+    console.log("Is Match:", isMatch);
     return isMatch;
 };
 userSchema.methods.createjwt = function () {
