@@ -56,7 +56,7 @@ export const registerC = async (req, res, next) => {
         token,
     });
 };
-export const loginC = async (req, res) => {
+export const loginC = async (req, res, next) => {
     try{
         const { email, password } = req.body;
         if (!email || !password) {
