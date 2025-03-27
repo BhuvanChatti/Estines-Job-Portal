@@ -3,6 +3,9 @@ import nodemailer from "nodemailer";
 const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
+        host:'smtp.gmail.com',
+        port:465,
+        secure: true,
         user: 'bhuvanchatti579@gmail.com',
         pass: 'dfgp nbue aekc yizo'
     }
@@ -39,7 +42,8 @@ export const registerC = async (req, res, next) => {
     const euser = await userModels.findOne({ email })
 
     if (euser) {
-        next('User already exists ,Please login');
+        next('User exists, please login');
+        sendEmail(user.email, 'Re-register attempt', 'There was a register attempt. You are an exisiting user kindly login at https://estines-job-portal-main-3.onrender.com');
     }
     const user = await userModels.create({ name, email, password, lastName, location });
     const token = user.createjwt();
