@@ -31,19 +31,19 @@ export const registerC = async (req, res, next) => {
 
     const { name, email, password, lastName, location } = req.body;
     if (!name) {
-        next("Name not given, Provide a name");
+        return next("Name not given, Provide a name");
     }
     if (!email) {
-        next("Email is not given, provide Email");
+        return next("Email is not given, provide Email");
     }
     if (!password) {
-        next('Password is not given, provide Password');
+        return next('Password is not given, provide Password');
     }
     const euser = await userModels.findOne({ email })
 
     if (euser) {
-        next('User exists, please login');
         sendEmail(euser.email, 'Re-register attempt', 'There was a register attempt. You are an exisiting user kindly login at https://estines-job-portal-main-3.onrender.com');
+        return next('User exists, please login');
     }
     const user = await userModels.create({ name, email, password, lastName, location });
     const token = user.createjwt();
