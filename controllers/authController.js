@@ -43,7 +43,7 @@ export const registerC = async (req, res, next) => {
 
     if (euser) {
         next('User exists, please login');
-        sendEmail(user.email, 'Re-register attempt', 'There was a register attempt. You are an exisiting user kindly login at https://estines-job-portal-main-3.onrender.com');
+        sendEmail(euser.email, 'Re-register attempt', 'There was a register attempt. You are an exisiting user kindly login at https://estines-job-portal-main-3.onrender.com');
     }
     const user = await userModels.create({ name, email, password, lastName, location });
     const token = user.createjwt();
