@@ -47,7 +47,7 @@ export const registerC = async (req, res, next) => {
     }
     const user = await userModels.create({ name, email, password, lastName, location });
     const token = user.createjwt();
-    sendEmail(user.email, 'Welcome to Our Site', 'Thank you for registering!');
+    sendEmail(user.email, 'Welcome to Our Estines Job Board', 'Thank you for registering!');
     res.status(201).send({
         success: true,
         message: 'User Created Successfully',
@@ -80,7 +80,7 @@ export const loginC = async (req, res, next) => {
         const token = user.createjwt()
         const date = new Date();
         const currtime = date.toLocaleString();
-        sendEmail(user.email, 'New login', `Youve logged into our site at ${currtime}`);
+        sendEmail(user.email, 'New login on Estines', `Youve logged into our site at ${currtime}`);
         res.status(200).json({
             success: true,
             messege: "Logged In successfully",
