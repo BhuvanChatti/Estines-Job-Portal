@@ -80,7 +80,7 @@ export const loginC = async (req, res, next) => {
         const token = user.createjwt()
         const date = new Date();
         const currtime = date.toLocaleString();
-        sendEmail(user.email, 'New login', 'Youve logged into our site at ${currtime}');
+        sendEmail(user.email, 'New login', `Youve logged into our site at ${currtime}`);
         res.status(200).json({
             success: true,
             messege: "Logged In successfully",
