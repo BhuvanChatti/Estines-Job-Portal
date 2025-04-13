@@ -3,8 +3,11 @@ import nodemailer from "nodemailer";
 const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
+        host:'smtp.gmail.com',
+        port:587,
+        secure: false,
         user: 'bhuvanchatti579@gmail.com',
-        pass: 'akshitha@135'
+        pass: 'dfgp nbue aekc yizo'
     }
 });
 
@@ -20,7 +23,7 @@ const sendEmail = (to, subject, text) => {
         if (error) {
             console.error('Error sending email:', error);
         } else {
-
+            console.log('Email sent:', info);
         }
     });
 };
@@ -28,22 +31,23 @@ export const registerC = async (req, res, next) => {
 
     const { name, email, password, lastName, location } = req.body;
     if (!name) {
-        next("Name not given, Provide a name");
+        return next("Name not given, Provide a name");
     }
     if (!email) {
-        next("Email is not given, provide Email");
+        return next("Email is not given, provide Email");
     }
     if (!password) {
-        next('Password is not given, provide Password');
+        return next('Password is not given, provide Password');
     }
     const euser = await userModels.findOne({ email })
 
     if (euser) {
-        next('User already exists ,Please login');
+        sendEmail(euser.email, 'Re-register attempt', 'There was a register attempt. You are an exisiting user kindly login at https://estines-job-portal-main-3.onrender.com');
+        return next('User exists, please login');
     }
     const user = await userModels.create({ name, email, password, lastName, location });
     const token = user.createjwt();
-    sendEmail(user.email, 'Welcome to Our Site', 'Thank you for registering!');
+    sendEmail(user.email, 'Welcome to Our Estines Job Board', 'Thank you for registering!');
     res.status(201).send({
         success: true,
         message: 'User Created Successfully',
@@ -56,25 +60,36 @@ export const registerC = async (req, res, next) => {
         token,
     });
 };
-export const loginC = async (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        next('Provide required fields');
+export const loginC = async (req, res, next) => {
+    try{
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return next('Provide required fields');
+        }
+        const user = await userModels.findOne({ email }).select("+password");
+        if (!user) {
+            return next('Invalid email or password');
+        }
+        console.log("User found:", user);
+        const isMatch = await user.compareP(password);
+        console.log("Password match:", isMatch);
+        if (!isMatch) {
+            return next('Wrong Password. Enter again');
+        }
+        user.password = undefined;
+        const token = user.createjwt()
+        const date = new Date();
+        const currtime = date.toLocaleString();
+        sendEmail(user.email, 'New login on Estines', `Youve logged into our site at ${currtime}`);
+        res.status(200).json({
+            success: true,
+            messege: "Logged In successfully",
+            user,
+            token,
+        })
     }
-    const user = await userModels.findOne({ email }).select("+password");
-    if (!user) {
-        next('Invalid email or password')
+    catch (error) {
+        console.error("Login error:", error);
+        next(error);
     }
-    const isMatch = await user.compareP(password);
-    if (!isMatch) {
-        next("Invalid user name or Password"); zz
-    }
-    user.password = undefined;
-    const token = user.createjwt()
-    res.status(200).json({
-        success: true,
-        messege: "Logged In successfully",
-        user,
-        token,
-    })
 };

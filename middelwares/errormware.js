@@ -6,7 +6,7 @@ const ermidlwr = (err, req, res, next) => {
     }
     if (err.name === "ValidationError") {
         defaultErrors.statusCode = 400;
-        defaultErrors.message = Object.values(err.errors).map((item) => item.messege).join(',');
+        defaultErrors.message = Object.values(err.errors).map((item) => item.message).join(',');
     }
     if (err.code && err.code === 11000) {
         defaultErrors.statusCode = 400;
