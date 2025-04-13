@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Password is Required'],
         minlength: [6, "Length should be greater than 8 charecters"],
-        select: true,
+        select: false,
     },
     location: {
         type: String,
@@ -28,12 +28,15 @@ const userSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 userSchema.pre('save', async function () {
-    if (!this.isModified) return;
+    if (!this.isModified('password')) return;
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
 });
 userSchema.methods.compareP = async function (up) {
+    console.log("Provided Password:", up);
+    console.log("Stored Hash:", this.password);
     const isMatch = await bcrypt.compare(up, this.password);
+    console.log("Is Match:", isMatch);
     return isMatch;
 };
 userSchema.methods.createjwt = function () {

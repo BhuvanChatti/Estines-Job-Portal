@@ -36,7 +36,7 @@ const options = {
 }
 const spec = swaggerDoc(options)
 const app = express();
-app.set('trust proxy', true);
+app.set('trust proxy', 1);
 
 app.use(morgan('dev'));
 app.use(helmet());
