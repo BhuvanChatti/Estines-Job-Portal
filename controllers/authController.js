@@ -3,11 +3,11 @@ import nodemailer from "nodemailer";
 const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-        host:'smtp.gmail.com',
-        port:587,
+        host: 'smtp.gmail.com',
+        port: 587,
         secure: false,
         user: 'bhuvanchatti579@gmail.com',
-        pass: 'dfgp nbue aekc yizo'
+        pass: 'ikml kxgu yyzw mquz'
     }
 });
 
@@ -61,7 +61,7 @@ export const registerC = async (req, res, next) => {
     });
 };
 export const loginC = async (req, res, next) => {
-    try{
+    try {
         const { email, password } = req.body;
         if (!email || !password) {
             return next('Provide required fields');
