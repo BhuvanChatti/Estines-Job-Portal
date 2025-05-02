@@ -15,7 +15,7 @@ export const getAllJobsController = async (req, res, next) => {
         // const jobs = await jobModels.find({ createdBy: req.body.user.userId })
         const { status, workType, search, sort } = req.query
         const queryObject = {
-            //createdBy: req.body.user.userId
+            createdBy: req.body.user.userId
         }
         if (status && status !== 'all') {
             queryObject.status = status;
