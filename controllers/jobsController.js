@@ -15,7 +15,7 @@ export const getAllJobsController = async (req, res, next) => {
         // const jobs = await jobModels.find({ createdBy: req.user.userId })
         const { status, workType, search, sort } = req.query
         const queryObject = {
-            createdBy: req.user.userId
+            //createdBy: req.user.userId
         }
         if (status && status !== 'all') {
             queryObject.status = status;
@@ -52,8 +52,7 @@ export const getAllJobsController = async (req, res, next) => {
             numOfPage
         })
     }
-    catch(error)
-    {
+    catch (error) {
         console.error("getAllJobsController Error:", error);
         res.status(500).json({ message: "Server Error", error: error.message });
     }
