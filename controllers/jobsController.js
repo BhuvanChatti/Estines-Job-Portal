@@ -11,45 +11,52 @@ export const createJobController = async (req, res, next) => {
     res.status(201).json({ job })
 };
 export const getAllJobsController = async (req, res, next) => {
-    // const jobs = await jobModels.find({ createdBy: req.user.userId })
-    const { status, workType, search, sort } = req.query
-    const queryObject = {
-        createdBy: req.user.userId
+    try {
+        // const jobs = await jobModels.find({ createdBy: req.user.userId })
+        const { status, workType, search, sort } = req.query
+        const queryObject = {
+            createdBy: req.user.userId
+        }
+        if (status && status !== 'all') {
+            queryObject.status = status;
+        }
+        if (workType && workType !== 'all') {
+            queryObject.workType = workType;
+        }
+        if (search) {
+            queryObject.position = { $regex: search, $options: 'i' };
+        }
+        let queryResult = jobModels.find(queryObject);
+        if (sort === 'latest') {
+            queryResult = queryResult.sort('-createdAt')
+        }
+        if (sort === 'oldest') {
+            queryResult = queryResult.sort('createdAt')
+        }
+        if (sort === 'a-z') {
+            queryResult = queryResult.sort('position')
+        }
+        if (sort === 'z-a') {
+            queryResult = queryResult.sort('-position')
+        }
+        const page = Number(req.query.page) || 1
+        const limit = Number(req.query.limit) || 10
+        const skip = (page - 1) * limit
+        queryResult = queryResult.skip(skip).limit(limit);
+        const totalJobs = await jobModels.countDocuments(queryObject);
+        const numOfPage = Math.ceil(totalJobs / limit);
+        const jobs = await queryResult;
+        res.status(200).json({
+            totalJobs,
+            jobs,
+            numOfPage
+        })
     }
-    if (status && status !== 'all') {
-        queryObject.status = status;
+    catch(error)
+    {
+        console.error("getAllJobsController Error:", error);
+        res.status(500).json({ message: "Server Error", error: error.message });
     }
-    if (workType && workType !== 'all') {
-        queryObject.workType = workType;
-    }
-    if (search) {
-        queryObject.position = { $regex: search, $options: 'i' };
-    }
-    let queryResult = jobModels.find(queryObject);
-    if (sort === 'latest') {
-        queryResult = queryResult.sort('-createdAt')
-    }
-    if (sort === 'oldest') {
-        queryResult = queryResult.sort('createdAt')
-    }
-    if (sort === 'a-z') {
-        queryResult = queryResult.sort('position')
-    }
-    if (sort === 'z-a') {
-        queryResult = queryResult.sort('-position')
-    }
-    const page = Number(req.query.page) || 1
-    const limit = Number(req.query.limit) || 10
-    const skip = (page - 1) * limit
-    queryResult = queryResult.skip(skip).limit(limit);
-    const totalJobs = await jobModels.countDocuments(queryObject);
-    const numOfPage = Math.ceil(totalJobs / limit);
-    const jobs = await queryResult;
-    res.status(200).json({
-        totalJobs,
-        jobs,
-        numOfPage
-    })
 };
 export const updateJobController = async (req, res, next) => {
     const { id } = req.params
