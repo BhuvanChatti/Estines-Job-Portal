@@ -6,16 +6,16 @@ export const createJobController = async (req, res, next) => {
     if (!company || !position) {
         next('Please provide all feilds')
     }
-    req.body.createdBy = req.user.userId
+    req.body.createdBy = req.body.user.userId
     const job = await jobModels.create(req.body)
     res.status(201).json({ job })
 };
 export const getAllJobsController = async (req, res, next) => {
     try {
-        // const jobs = await jobModels.find({ createdBy: req.user.userId })
+        // const jobs = await jobModels.find({ createdBy: req.body.user.userId })
         const { status, workType, search, sort } = req.query
         const queryObject = {
-            //createdBy: req.user.userId
+            //createdBy: req.body.user.userId
         }
         if (status && status !== 'all') {
             queryObject.status = status;
@@ -67,7 +67,7 @@ export const updateJobController = async (req, res, next) => {
     if (!job) {
         next(`No jobs Found With This Id: ${id}`)
     }
-    if (!req.user.userId === job.createdBy.toString()) {
+    if (!req.body.user.userId === job.createdBy.toString()) {
         next("You are not authorized to update this job");
         return;
     }
@@ -83,7 +83,7 @@ export const deleteJobController = async (req, res, next) => {
     if (!job) {
         next(`No jobs Found With This Id: ${id}`)
     }
-    if (!req.user.userId === job.createdBy.toString()) {
+    if (!req.body.user.userId === job.createdBy.toString()) {
         next("You are not authorized to update this job");
         return;
     }
@@ -94,7 +94,7 @@ export const JobStatController = async (req, res) => {
     const stats = await jobModels.aggregate([
         {
             $match: {
-                createdBy: new mongoose.Types.ObjectId(req.user.userId),
+                createdBy: new mongoose.Types.ObjectId(req.body.user.userId),
             },
         },
         {
@@ -113,7 +113,7 @@ export const JobStatController = async (req, res) => {
 
         {
             $match: {
-                createdBy: new mongoose.Types.ObjectId(req.user.userId),
+                createdBy: new mongoose.Types.ObjectId(req.body.user.userId),
             },
         },
         {
