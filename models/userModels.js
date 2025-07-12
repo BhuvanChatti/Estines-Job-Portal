@@ -25,6 +25,11 @@ const userSchema = new mongoose.Schema({
     location: {
         type: String,
         default: 'India'
+    },
+    type: {
+        type: String,
+        required: [true, 'Type is Required'],
+        default: 'Applicant'
     }
 }, { timestamps: true });
 userSchema.pre('save', async function () {

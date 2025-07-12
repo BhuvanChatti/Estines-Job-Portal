@@ -29,7 +29,7 @@ const sendEmail = (to, subject, text) => {
 };
 export const registerC = async (req, res, next) => {
 
-    const { name, email, password, lastName, location } = req.body;
+    const { name, email, password, lastName, location, type } = req.body;
     if (!name) {
         return next("Name not given, Provide a name");
     }
@@ -45,7 +45,7 @@ export const registerC = async (req, res, next) => {
         sendEmail(euser.email, 'Re-register attempt', 'There was a register attempt. You are an exisiting user kindly login at https://estines-job-portal-main-3.onrender.com');
         return next('User exists, please login');
     }
-    const user = await userModels.create({ name, email, password, lastName, location });
+    const user = await userModels.create({ name, email, password, lastName, location, type });
     const token = user.createjwt();
     sendEmail(user.email, 'Welcome to Our Estines Job Board', 'Thank you for registering!');
     res.status(201).send({

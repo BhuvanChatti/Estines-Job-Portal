@@ -1,4 +1,5 @@
-import jobModels from "../models/jobModels.js"
+import jobModels from "../models/jobModels.js";
+import ApplJobs from "../models/jobsApplied.js";
 import mongoose from "mongoose";
 import moment from "moment";
 export const createJobController = async (req, res, next) => {
@@ -14,9 +15,7 @@ export const getAllJobsController = async (req, res, next) => {
     try {
         // const jobs = await jobModels.find({ createdBy: req.body.user.userId })
         const { status, workType, search, sort } = req.query
-        const queryObject = {
-            createdBy: req.body.user.userId
-        }
+        const queryObject = {}
         if (status && status !== 'all') {
             queryObject.status = status;
         }
@@ -57,6 +56,7 @@ export const getAllJobsController = async (req, res, next) => {
         res.status(500).json({ message: "Server Error", error: error.message });
     }
 };
+
 export const updateJobController = async (req, res, next) => {
     const { id } = req.params
     const { company, position } = req.body
