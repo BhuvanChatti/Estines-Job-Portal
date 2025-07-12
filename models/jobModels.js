@@ -9,12 +9,6 @@ const jobSchema = new mongoose.Schema({
         required: [true, 'Job position is required'],
         maxlength: 100,
     },
-    status: {
-        type: 'String',
-        //required:[true, 'Company name is required'],
-        enum: ['Pending', 'Reject', 'Interview'],
-        default: 'Pending'
-    },
     workType: {
         type: 'String',
         //required:[true, 'Company name is required'],
@@ -31,4 +25,4 @@ const jobSchema = new mongoose.Schema({
         ref: 'User'
     }
 }, { timestamps: true });
-export default mongoose.model('Job', jobSchema)
+export default mongoose.model('Job', jobSchema, "jobs1");
