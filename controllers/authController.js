@@ -45,6 +45,10 @@ export const registerC = async (req, res, next) => {
         sendEmail(euser.email, 'Re-register attempt', 'There was a register attempt. You are an exisiting user kindly login at https://estines-job-portal-main-3.onrender.com');
         return next('User exists, please login');
     }
+    if(type!=="Applicant" && type!=="Recruiter"){
+        return next("User type must be 'Applicant' or 'Recruiter'");
+    }
+
     const user = await userModels.create({ name, email, password, lastName, location, type });
     const token = user.createjwt();
     sendEmail(user.email, 'Welcome to Our Estines Job Board', 'Thank you for registering!');
@@ -56,6 +60,7 @@ export const registerC = async (req, res, next) => {
             lastName: user.lastName,
             email: user.email,
             location: user.location,
+            userType: user.type
         },
         token,
     });
