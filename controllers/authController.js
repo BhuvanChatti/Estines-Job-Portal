@@ -3,18 +3,15 @@ import nodemailer from "nodemailer";
 const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        user: 'bhuvanchattiproject@gmail.com',
-        pass: 'shhd honu hhvm bwmd'
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
     }
 });
 
 // Function to send email
 const sendEmail = (to, subject, text) => {
     const mailOptions = {
-        from: 'bhuvanchatti579@gmail.com',
+        from: process.env.EMAIL_FROM,
         to: to,
         subject: subject,
         text: text

@@ -7,7 +7,7 @@ export const applyController = async (req, res, next) => {
         const C = J.createdBy;
         const Jid = J._id;
         const U = req.body.user.userId;
-        const A = ApplJobs.create({ ApplicantID: U, createdBy: C, JobId: J });
+        const A = await ApplJobs.create({ ApplicantID: U, createdBy: C, JobId: Jid });
         console.log("success:", A);
         res.status(201).send({ message: "Applied Successfully", Appliedas: A });
     }

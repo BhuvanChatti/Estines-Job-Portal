@@ -3,9 +3,9 @@ import userModels from "../models/userModels.js";
 export const updateUserController = async (req, res, next) => {
     const { name, email, lastName, location } = req.body
     if (!name || !email || !lastName || !location) {
-        next('Please provide all Fields')
+        return next('Please provide all Fields')
     }
-    const user = await userModels.findOne({ _id: req.user.userId })
+    const user = await userModels.findOne({ _id: req.body.user.userId })
     user.name = name
     user.lastName = lastName
     user.email = email
@@ -19,20 +19,18 @@ export const updateUserController = async (req, res, next) => {
 };
 export const getUserController = async (req, res, next) => {
     try {
-        const user = await userModels.findById({ _id: req.body.user.userId });
-        user.password = undefined;
+        const user = await userModels.findById(req.body.user.userId);
         if (!user) {
-            return res.status(200).send({
+            return res.status(404).send({
                 message: 'User Not Found',
                 success: false
             })
         }
-        else {
-            res.status(200).send({
-                success: true,
-                data: user,
-            })
-        }
+        user.password = undefined;
+        res.status(200).send({
+            success: true,
+            data: user,
+        })
     } catch (error) {
 
         res.status(500).send({

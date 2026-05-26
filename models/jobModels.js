@@ -20,6 +20,14 @@ const jobSchema = new mongoose.Schema({
         default: 'Andhra Pradesh',
         required: [true, 'workLocation is required'],
     },
+    description: {
+        type: String,
+        default: ''
+    },
+    requirements: {
+        type: [String],
+        default: []
+    },
     createdBy: {
         type: mongoose.Types.ObjectId,
         ref: 'User'

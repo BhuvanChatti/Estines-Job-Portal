@@ -67,9 +67,8 @@ export const updateJobController = async (req, res, next) => {
     if (!job) {
         next(`No jobs Found With This Id: ${id}`)
     }
-    if (!req.body.user.userId === job.createdBy.toString()) {
-        next("You are not authorized to update this job");
-        return;
+    if (req.body.user.userId !== job.createdBy.toString()) {
+        return next("You are not authorized to update this job");
     }
     const updateJob = await jobModels.findOneAndUpdate({ _id: id }, req.body, {
         new: true,
@@ -83,53 +82,46 @@ export const deleteJobController = async (req, res, next) => {
     if (!job) {
         next(`No jobs Found With This Id: ${id}`)
     }
-    if (!req.body.user.userId === job.createdBy.toString()) {
-        next("You are not authorized to update this job");
-        return;
+    if (req.body.user.userId !== job.createdBy.toString()) {
+        return next("You are not authorized to update this job");
     }
     await job.deleteOne();
     res.status(200).json({ message: "Sucess, Job deleted" });
 };
 export const JobStatController = async (req, res) => {
-    const stats = await jobModels.aggregate([
-        {
-            $match: {
-                createdBy: new mongoose.Types.ObjectId(req.body.user.userId),
-            },
-        },
-        {
-            $group: {
-                _id: "$status",
-                count: { $sum: 1 },
-            }
-        },
-    ]);
-    const defaultStats = {
-        Pending: stats.PeInding || 0,
-        Reject: stats.Reject || 0,
-        Interview: stats.Reject || 0
-    };
-    let monthlyApplication = await jobModels.aggregate([
+    const userId = new mongoose.Types.ObjectId(req.body.user.userId);
 
-        {
-            $match: {
-                createdBy: new mongoose.Types.ObjectId(req.body.user.userId),
-            },
-        },
+    const totalJobs = await jobModels.countDocuments({ createdBy: userId });
+
+    const statusAgg = await ApplJobs.aggregate([
+        { $match: { createdBy: userId } },
+        { $group: { _id: "$status", count: { $sum: 1 } } },
+    ]);
+    const statsMap = statusAgg.reduce((acc, cur) => {
+        acc[cur._id] = cur.count;
+        return acc;
+    }, {});
+    const defaultStats = {
+        Pending: statsMap.Pending || 0,
+        Reject: statsMap.Reject || 0,
+        Interview: statsMap.Interview || 0,
+        Selected: statsMap.Selected || 0,
+    };
+
+    let monthlyApplication = await ApplJobs.aggregate([
+        { $match: { createdBy: userId } },
         {
             $group: {
-                _id: {
-                    year: { $year: '$createdAt' },
-                    month: { $month: '$createdAt' }
-                },
+                _id: { year: { $year: '$createdAt' }, month: { $month: '$createdAt' } },
                 count: { $sum: 1 }
             }
         },
     ]);
     monthlyApplication = monthlyApplication.map(item => {
-        const { _id: { year, month }, count } = item
-        const date = moment().month(month - 1).year(year).format('MMM y')
-        return { date, count }
+        const { _id: { year, month }, count } = item;
+        const date = moment().month(month - 1).year(year).format('MMM y');
+        return { date, count };
     }).reverse();
-    res.status(200).json({ totalJobs: stats.length, defaultStats, monthlyApplication });
+
+    res.status(200).json({ totalJobs, defaultStats, monthlyApplication });
 };

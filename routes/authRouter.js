@@ -104,6 +104,5 @@ router.post('/register', limiter, registerC);
  *        description: something went wrong
  */
 
-router.post('/register', limiter, registerC);
 router.post('/login', limiter, loginC);
 export default router;
