@@ -32,7 +32,6 @@ export const uploadResumeController = async (req, res, next) => {
         const parsed = await pdfParse(buffer);
         const text = parsed.text?.slice(0, 8000) || '';
 
-        // Claude parses the extracted text into structured JSON
         const message = await anthropic.messages.create({
             model: 'claude-haiku-4-5-20251001',
             max_tokens: 1024,

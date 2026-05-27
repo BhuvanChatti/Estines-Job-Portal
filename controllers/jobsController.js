@@ -3,13 +3,16 @@ import ApplJobs from "../models/jobsApplied.js";
 import mongoose from "mongoose";
 import moment from "moment";
 export const createJobController = async (req, res, next) => {
-    const { company, position } = req.body
+    const { company, position, requirements } = req.body;
     if (!company || !position) {
-        next('Please provide all feilds')
+        return next('Please provide all fields');
     }
-    req.body.createdBy = req.body.user.userId
-    const job = await jobModels.create(req.body)
-    res.status(201).json({ job })
+    if (!requirements || !Array.isArray(requirements) || requirements.length === 0) {
+        return next('Please provide at least one requirement');
+    }
+    req.body.createdBy = req.body.user.userId;
+    const job = await jobModels.create(req.body);
+    res.status(201).json({ job });
 };
 export const getAllJobsController = async (req, res, next) => {
     try {
@@ -61,11 +64,11 @@ export const updateJobController = async (req, res, next) => {
     const { id } = req.params
     const { company, position } = req.body
     if (!company || !position) {
-        next("Please Provide Required Feilds")
+        return next("Please Provide Required Fields");
     }
-    const job = await jobModels.findOne({ _id: id })
+    const job = await jobModels.findOne({ _id: id });
     if (!job) {
-        next(`No jobs Found With This Id: ${id}`)
+        return next(`No jobs Found With This Id: ${id}`);
     }
     if (req.body.user.userId !== job.createdBy.toString()) {
         return next("You are not authorized to update this job");
