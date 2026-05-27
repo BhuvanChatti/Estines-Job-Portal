@@ -1,5 +1,5 @@
 import e from "express";
-import { loginC, registerC} from "../controllers/authController.js";
+import { loginC, registerC, sendOtpController, verifyOtpController, resetPasswordController } from "../controllers/authController.js";
 import rateLimit from "express-rate-limit";
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000,
@@ -105,4 +105,7 @@ router.post('/register', limiter, registerC);
  */
 
 router.post('/login', limiter, loginC);
+router.post('/send-otp', limiter, sendOtpController);
+router.post('/verify-otp', limiter, verifyOtpController);
+router.post('/reset-password', limiter, resetPasswordController);
 export default router;

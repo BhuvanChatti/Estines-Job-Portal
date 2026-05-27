@@ -44,7 +44,10 @@ const userSchema = new mongoose.Schema({
         skills: [String],
         experience: [{ title: String, company: String, duration: String, description: String }],
         education: [{ degree: String, institution: String, year: String }]
-    }
+    },
+    otpHash: { type: String, select: false },
+    otpExpiry: { type: Date },
+    otpVerified: { type: Boolean, default: false }
 }, { timestamps: true });
 userSchema.pre('save', async function () {
     if (!this.isModified('password')) return;
@@ -52,11 +55,7 @@ userSchema.pre('save', async function () {
     this.password = await bcrypt.hash(this.password, salt);
 });
 userSchema.methods.compareP = async function (up) {
-    console.log("Provided Password:", up);
-    console.log("Stored Hash:", this.password);
-    const isMatch = await bcrypt.compare(up, this.password);
-    console.log("Is Match:", isMatch);
-    return isMatch;
+    return bcrypt.compare(up, this.password);
 };
 userSchema.methods.createjwt = function () {
     return jwt.sign({ userId: this._id }, process.env.JWT_S, {

@@ -1,5 +1,26 @@
 import userModels from "../models/userModels.js";
 
+export const changePasswordController = async (req, res, next) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        if (!currentPassword || !newPassword) return next('All fields are required');
+        if (newPassword.length < 6) return next('New password must be at least 6 characters');
+
+        const user = await userModels.findById(req.body.user.userId).select('+password');
+        if (!user) return next('User not found');
+
+        const isMatch = await user.compareP(currentPassword);
+        if (!isMatch) return next('Current password is incorrect');
+
+        user.password = newPassword;
+        await user.save();
+
+        res.status(200).json({ success: true, message: 'Password changed successfully' });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const updateUserController = async (req, res, next) => {
     const { name, email, lastName, location } = req.body
     if (!name || !email || !lastName || !location) {
