@@ -1,9 +1,10 @@
 import { v2 as cloudinary } from 'cloudinary';
 import { createRequire } from 'module';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import userModels from '../models/userModels.js';
+
 const require = createRequire(import.meta.url);
 const pdfParse = require('pdf-parse');
-import Anthropic from '@anthropic-ai/sdk';
-import userModels from '../models/userModels.js';
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -11,7 +12,7 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const uploadResumeController = async (req, res, next) => {
     try {
@@ -19,7 +20,6 @@ export const uploadResumeController = async (req, res, next) => {
 
         const buffer = req.file.buffer;
 
-        // Upload to Cloudinary as raw file (PDF)
         const uploadResult = await new Promise((resolve, reject) => {
             const stream = cloudinary.uploader.upload_stream(
                 { resource_type: 'raw', folder: 'estines-resumes', format: 'pdf' },
@@ -28,35 +28,17 @@ export const uploadResumeController = async (req, res, next) => {
             stream.end(buffer);
         });
 
-        // Extract text from PDF
         const parsed = await pdfParse(buffer);
         const text = parsed.text?.slice(0, 8000) || '';
 
-        const message = await anthropic.messages.create({
-            model: 'claude-haiku-4-5-20251001',
-            max_tokens: 1024,
-            messages: [{
-                role: 'user',
-                content: `Extract the following information from this resume text and return ONLY valid JSON with no explanation:
-{
-  "name": "",
-  "email": "",
-  "phone": "",
-  "location": "",
-  "summary": "",
-  "skills": [],
-  "experience": [{"title": "", "company": "", "duration": "", "description": ""}],
-  "education": [{"degree": "", "institution": "", "year": ""}]
-}
-
-Resume text:
-${text}`
-            }]
-        });
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const result = await model.generateContent(
+            `Extract the following information from this resume text and return ONLY valid JSON with no explanation:\n{"name":"","email":"","phone":"","location":"","summary":"","skills":[],"experience":[{"title":"","company":"","duration":"","description":""}],"education":[{"degree":"","institution":"","year":""}]}\n\nResume text:\n${text}`
+        );
 
         let parsedResume = {};
         try {
-            const raw = message.content[0].text.trim();
+            const raw = result.response.text().trim();
             const jsonStart = raw.indexOf('{');
             const jsonEnd = raw.lastIndexOf('}');
             parsedResume = JSON.parse(raw.slice(jsonStart, jsonEnd + 1));
@@ -64,7 +46,6 @@ ${text}`
             parsedResume = {};
         }
 
-        // Save URL and parsed data to user
         await userModels.findByIdAndUpdate(req.body.user.userId, {
             resumeUrl: uploadResult.secure_url,
             parsedResume,
