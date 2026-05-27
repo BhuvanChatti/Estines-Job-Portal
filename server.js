@@ -1,8 +1,8 @@
+import 'dotenv/config';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDoc from "swagger-jsdoc";
 import express from 'express';
 import "express-async-errors";
-import dotenv from 'dotenv';
 import colors from 'colors';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -16,7 +16,6 @@ import ermidlwr from './middelwares/errormware.js';
 import jobsRoutes from './routes/jobsRoutes.js'
 import userRoutes from './routes/userRoutes.js';
 import resumeRoutes from './routes/resumeRoutes.js';
-dotenv.config();
 
 connectDB();
 
