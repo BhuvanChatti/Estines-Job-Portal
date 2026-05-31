@@ -31,20 +31,6 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Type is Required'],
         default: 'Applicant'
     },
-    resumeUrl: {
-        type: String,
-        default: ''
-    },
-    parsedResume: {
-        name: String,
-        email: String,
-        phone: String,
-        location: String,
-        summary: String,
-        skills: [String],
-        experience: [{ title: String, company: String, duration: String, description: String }],
-        education: [{ degree: String, institution: String, year: String }]
-    },
     otpHash: { type: String, select: false },
     otpExpiry: { type: Date },
     otpVerified: { type: Boolean, default: false }

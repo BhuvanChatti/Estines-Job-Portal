@@ -24,6 +24,8 @@ const jobSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    salaryMin: { type: Number, default: null },
+    salaryMax: { type: Number, default: null },
     requirements: {
         type: [String],
         default: []

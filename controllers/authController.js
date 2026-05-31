@@ -17,7 +17,11 @@ export const registerC = async (req, res, next) => {
 
         const user = await userModels.create({ name, email, password, lastName, location, type });
         const token = user.createjwt();
-        sendEmail(user.email, 'Welcome to Estines', 'Thank you for registering!');
+        sendEmail(
+            user.email,
+            'Welcome to Estines!',
+            `Hi ${user.name},\n\nWelcome to Estines Job Portal! Your account is ready.\n\nStart exploring opportunities at your new home for careers.\n\n— The Estines Team`
+        );
         res.status(201).send({
             success: true,
             message: 'User Created Successfully',
@@ -100,7 +104,7 @@ export const loginC = async (req, res, next) => {
         }
         const user = await userModels.findOne({ email }).select("+password");
         if (!user) {
-            return next('Invalid email or password');
+            return next('User with this email does not exist, please register');
         }
         const isMatch = await user.compareP(password);
         if (!isMatch) {
@@ -110,7 +114,7 @@ export const loginC = async (req, res, next) => {
         const token = user.createjwt()
         const date = new Date();
         const currtime = date.toLocaleString();
-        sendEmail(user.email, 'New login on Estines', `Youve logged into our site at ${currtime}`);
+        sendEmail(user.email, 'New login on Estines', `You've logged into Estines at ${currtime}`);
         res.status(200).json({
             success: true,
             messege: "Logged In successfully",

@@ -8,6 +8,7 @@ const userAuth = async (req, res, next) => {
     try {
         const payload = JWT.verify(token, process.env.JWT_S);
         req.body.user = { userId: payload.userId };
+        req.user = { userId: payload.userId };
         next();
     } catch (error) {
         next("Athentication failed")
